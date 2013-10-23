@@ -947,6 +947,16 @@ setting of this variable."
   :type 'boolean)
 
 
+(defcustom undo-tree-visualizer-cyle-on-switch-branch nil
+  "When non-nil, enable cycling during a branch switch.
+
+When enabled, attempting to switch branches to the left
+and right will work cyclicly rather than being bounded
+at the left and rightmost branches."
+  :group 'undo-tree-visualizer
+  :type 'string)
+
+
 (defcustom undo-tree-visualizer-diff nil
   "When non-nil, display diff by default in undo-tree visualizer.
 
@@ -3855,12 +3865,14 @@ using `undo-tree-redo' or `undo-tree-visualizer-redo'."
     (undo-tree-highlight-active-branch (undo-tree-current buffer-undo-tree)))
   ;; increment branch
   (let ((branch (undo-tree-node-branch (undo-tree-current buffer-undo-tree))))
-  (setf (undo-tree-node-branch (undo-tree-current buffer-undo-tree))
-        (cond
-         ((>= (+ branch arg) (undo-tree-num-branches))
-          (1- (undo-tree-num-branches)))
-         ((<= (+ branch arg) 0) 0)
-         (t (+ branch arg))))
+    (setf (undo-tree-node-branch (undo-tree-current buffer-undo-tree))
+	  (if undo-tree-visualizer-cyle-on-switch-branch
+	      (mod (+ branch arg) (undo-tree-num-branches))
+	    (cond
+	     ((>= (+ branch arg) (undo-tree-num-branches))
+	      (1- (undo-tree-num-branches)))
+	     ((<= (+ branch arg) 0) 0)
+	     (t (+ branch arg)))))
   (let ((inhibit-read-only t))
     ;; highlight new active branch below current node
     (goto-char (undo-tree-node-marker (undo-tree-current buffer-undo-tree)))
