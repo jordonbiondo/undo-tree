@@ -954,7 +954,7 @@ When enabled, attempting to switch branches to the left
 and right will work cyclicly rather than being bounded
 at the left and rightmost branches."
   :group 'undo-tree-visualizer
-  :type 'string)
+  :type 'boolean)
 
 
 (defcustom undo-tree-visualizer-diff nil
